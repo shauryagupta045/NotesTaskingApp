@@ -10,6 +10,9 @@ import {
   FaUser,
   FaBars,
   FaTimes,
+  FaCopy,
+  FaEdit,
+  FaExpand,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
@@ -20,16 +23,18 @@ const Notes = () => {
   const [recording, setRecording] = useState(false);
   const [activeTab, setActiveTab] = useState("home");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [loggedInUser , setLoggedInUser] = useState("");
+  const [loggedInUser, setLoggedInUser] = useState("");
+  const [selectedNote, setSelectedNote] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editText, setEditText] = useState("");
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const recognitionRef = useRef(null);
 
   const navigate = useNavigate();
-  
-  
 
-  useEffect(( ) =>{
+  useEffect(() => {
     setLoggedInUser(localStorage.getItem('loggedInuser'));
-  })
+  }, []);
 
   useEffect(() => {
     const savedNotes = JSON.parse(localStorage.getItem("notes")) || [];
@@ -63,10 +68,11 @@ const Notes = () => {
 
   const addNote = () => {
     if (input.trim() !== "") {
-      setNotes([...notes, { id: Date.now(), text: input, favorite: false }]);
+      setNotes([...notes, { id: Date.now(), text: input, favorite: false, image: null }]);
       setInput("");
     }
   };
+
   const toggleFavorite = (id) => {
     setNotes((prevNotes) =>
       prevNotes.map((note) =>
@@ -74,24 +80,64 @@ const Notes = () => {
       )
     );
   };
-  
+
   const deleteNote = (id) => {
     setNotes((prevNotes) => prevNotes.filter((note) => note.id !== id));
+  };
 
+  const handleLogout = (e) => {
+    e.preventDefault();
+    localStorage.removeItem("token");
+    localStorage.removeItem("loggedInuser");
+    alert("Logout Successfully ");
+    setTimeout(() => {
+      navigate("/");
+    }, 1000);
+  };
 
+  const openModal = (note) => {
+    setSelectedNote(note);
+    setEditText(note.text);
+    setIsModalOpen(true);
+  };
 
-  }
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedNote(null);
+    setEditText("");
+  };
 
-const handleLogout =(e) =>{
-  e.preventDefault();
-  localStorage.removeItem("token");
-  localStorage.removeItem("loggedInuser");
-  alert("Logout Successfully ");
-  setTimeout(()=>{
-    navigate("/");
-  } , 1000)
+  const handleEditNote = () => {
+    setNotes((prevNotes) =>
+      prevNotes.map((note) =>
+        note.id === selectedNote.id ? { ...note, text: editText } : note
+      )
+    );
+    closeModal();
+  };
 
-}
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNotes((prevNotes) =>
+          prevNotes.map((note) =>
+            note.id === selectedNote.id ? { ...note, image: reader.result } : note
+          )
+        );
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const toggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen);
+  };
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+  };
 
   return (
     <div className="flex h-screen bg-gray-900 text-white">
@@ -117,8 +163,7 @@ const handleLogout =(e) =>{
         </ul>
         <div className="absolute bottom-4 left-4 flex items-center">
           <FaUser className="mr-2" />{loggedInUser}
-          <button className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-
-          2 px-4 rounded" onClick={handleLogout}>Logout</button>
+          <button className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded" onClick={handleLogout}>Logout</button>
         </div>
       </div>
 
@@ -139,7 +184,14 @@ const handleLogout =(e) =>{
           {notes.filter((note) => (activeTab === "favorites" ? note.favorite && note.text.toLowerCase().includes(search.toLowerCase()) : note.text.toLowerCase().includes(search.toLowerCase()))).map((note) => (
             <div key={note.id} className="bg-gray-800 p-4 shadow-md rounded-lg relative">
               <p className="font-bold">{note.text}</p>
+              {note.image && <img src={note.image} alt="note" className="mt-2 rounded-lg" />}
               <div className="absolute bottom-2 right-2 flex gap-2">
+                <button onClick={() => copyToClipboard(note.text)}>
+                  <FaCopy className="text-gray-400" />
+                </button>
+                <button onClick={() => openModal(note)}>
+                  <FaEdit className="text-gray-400" />
+                </button>
                 <button onClick={() => toggleFavorite(note.id)}>
                   <FaStar className={note.favorite ? "text-yellow-400" : "text-gray-400"} />
                 </button>
@@ -160,6 +212,38 @@ const handleLogout =(e) =>{
           
           <button onClick={addNote} className="bg-purple-600 text-white px-4 py-2 rounded-lg">Save</button>
         </div>
+
+        {/* Modal */}
+        {isModalOpen && selectedNote && (
+          <div className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center ${isFullscreen ? "p-0" : "p-4"}`}>
+            <div className={`bg-gray-800 rounded-lg shadow-lg ${isFullscreen ? "w-full h-full" : "w-11/12 md:w-1/2"}`}>
+              <div className="p-4">
+                <textarea
+                  className="w-full p-3 bg-gray-700 text-white rounded-lg mb-4"
+                  value={editText}
+                  onChange={(e) => setEditText(e.target.value)}
+                />
+                {selectedNote.image && <img src={selectedNote.image} alt="note" className="mt-2 rounded-lg" />}
+                <div className="flex justify-between items-center">
+                  <div className="flex gap-2">
+                    <button onClick={handleEditNote} className="bg-purple-600 text-white px-4 py-2 rounded-lg">Save</button>
+                    <button onClick={toggleFullscreen} className="bg-gray-700 text-white px-4 py-2 rounded-lg">
+                      <FaExpand />
+                    </button>
+                    <button onClick={() => toggleFavorite(selectedNote.id)} className="bg-gray-700 text-white px-4 py-2 rounded-lg">
+                      <FaStar className={selectedNote.favorite ? "text-yellow-400" : "text-gray-400"} />
+                    </button>
+                    <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" id="image-upload" />
+                    <label htmlFor="image-upload" className="bg-gray-700 text-white px-4 py-2 rounded-lg cursor-pointer">
+                      <FaImage />
+                    </label>
+                  </div>
+                  <button onClick={closeModal} className="bg-red-600 text-white px-4 py-2 rounded-lg">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
