@@ -38,7 +38,7 @@ function Hero() {
 
 
   const handlego = () => {
-    navigate("/notes");
+    navigate("/sign");
   }
 
   

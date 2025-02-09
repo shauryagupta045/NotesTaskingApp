@@ -34,16 +34,8 @@ const Notes = () => {
 
   useEffect(() => {
     setLoggedInUser(localStorage.getItem('loggedInuser'));
+    fetchNotes();
   }, []);
-
-  useEffect(() => {
-    const savedNotes = JSON.parse(localStorage.getItem("notes")) || [];
-    setNotes(savedNotes);
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("notes", JSON.stringify(notes));
-  }, [notes]);
 
   useEffect(() => {
     if ("webkitSpeechRecognition" in window) {
@@ -66,23 +58,70 @@ const Notes = () => {
     }
   };
 
-  const addNote = () => {
-    if (input.trim() !== "") {
-      setNotes([...notes, { id: Date.now(), text: input, favorite: false, image: null }]);
-      setInput("");
-    }
-  };
-
   const toggleFavorite = (id) => {
     setNotes((prevNotes) =>
       prevNotes.map((note) =>
-        note.id === id ? { ...note, favorite: !note.favorite } : note
+        note._id === id ? { ...note, favorite: !note.favorite } : note
       )
     );
   };
 
-  const deleteNote = (id) => {
-    setNotes((prevNotes) => prevNotes.filter((note) => note.id !== id));
+  const deleteNote = async (id) => {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:8080/api/notes/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+        const result = await response.json();
+        if (result.success) {
+            setNotes(prevNotes => prevNotes.filter(note => note._id !== id));
+        }
+    } catch (err) {
+        console.error(err);
+    }
+  };
+
+  const fetchNotes = async () => {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:8080/api/notes', {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+        const result = await response.json();
+        if (result.success) {
+            setNotes(result.notes);
+        }
+    } catch (err) {
+        console.error(err);
+    }
+  };
+
+  const addNote = async () => {
+    if (input.trim() !== "") {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch('http://localhost:8080/api/notes', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text: input }),
+            });
+            const result = await response.json();
+            if (result.success) {
+                setNotes([...notes, result.note]);
+                setInput("");
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    }
   };
 
   const handleLogout = (e) => {
@@ -110,7 +149,7 @@ const Notes = () => {
   const handleEditNote = () => {
     setNotes((prevNotes) =>
       prevNotes.map((note) =>
-        note.id === selectedNote.id ? { ...note, text: editText } : note
+        note._id === selectedNote._id ? { ...note, text: editText } : note
       )
     );
     closeModal();
@@ -123,7 +162,7 @@ const Notes = () => {
       reader.onloadend = () => {
         setNotes((prevNotes) =>
           prevNotes.map((note) =>
-            note.id === selectedNote.id ? { ...note, image: reader.result } : note
+            note._id === selectedNote._id ? { ...note, image: reader.result } : note
           )
         );
       };
@@ -161,9 +200,12 @@ const Notes = () => {
             <FaStar className="mr-2" /> Favorites
           </li>
         </ul>
-        <div className="absolute bottom-4 left-4 flex items-center">
-          <FaUser className="mr-2" />{loggedInUser}
-          <button className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded" onClick={handleLogout}>Logout</button>
+        <div className="absolute bottom-4 left-4 flex items-center gap-2">
+          <FaUser className="mr-2" />
+          {loggedInUser}
+          <button className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded" onClick={handleLogout}>
+            Logout
+          </button>
         </div>
       </div>
 
@@ -182,7 +224,7 @@ const Notes = () => {
         {/* Notes List */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-auto">
           {notes.filter((note) => (activeTab === "favorites" ? note.favorite && note.text.toLowerCase().includes(search.toLowerCase()) : note.text.toLowerCase().includes(search.toLowerCase()))).map((note) => (
-            <div key={note.id} className="bg-gray-800 p-4 shadow-md rounded-lg relative">
+            <div key={note._id} className="bg-gray-800 p-4 shadow-md rounded-lg relative">
               <p className="font-bold">{note.text}</p>
               {note.image && <img src={note.image} alt="note" className="mt-2 rounded-lg" />}
               <div className="absolute bottom-2 right-2 flex gap-2">
@@ -192,10 +234,10 @@ const Notes = () => {
                 <button onClick={() => openModal(note)}>
                   <FaEdit className="text-gray-400" />
                 </button>
-                <button onClick={() => toggleFavorite(note.id)}>
+                <button onClick={() => toggleFavorite(note._id)}>
                   <FaStar className={note.favorite ? "text-yellow-400" : "text-gray-400"} />
                 </button>
-                <button onClick={() => deleteNote(note.id)}>
+                <button onClick={() => deleteNote(note._id)}>
                   <FaTrash className="text-red-500" />
                 </button>
               </div>
@@ -230,7 +272,7 @@ const Notes = () => {
                     <button onClick={toggleFullscreen} className="bg-gray-700 text-white px-4 py-2 rounded-lg">
                       <FaExpand />
                     </button>
-                    <button onClick={() => toggleFavorite(selectedNote.id)} className="bg-gray-700 text-white px-4 py-2 rounded-lg">
+                    <button onClick={() => toggleFavorite(selectedNote._id)} className="bg-gray-700 text-white px-4 py-2 rounded-lg">
                       <FaStar className={selectedNote.favorite ? "text-yellow-400" : "text-gray-400"} />
                     </button>
                     <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" id="image-upload" />
