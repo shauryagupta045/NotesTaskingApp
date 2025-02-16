@@ -21,7 +21,7 @@ const [signupInfo , setsignupInfo] = useState({
 }
     const handleChange = (e) =>{
       const {name , value} = e.target;
-      console.log(name,value);
+     
       const  copysignupInfo = {...signupInfo};
       copysignupInfo[name] = value;
       setsignupInfo(copysignupInfo);
@@ -63,7 +63,7 @@ try{
   handlError(message);
  }
 
-    console.log(result);
+   
 }catch (err){
   handlError(err);
 
