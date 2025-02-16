@@ -70,7 +70,7 @@ const Notes = () => {
   const deleteNote = async (id) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:8080/api/notes/${id}`, {
+      const response = await fetch(`https://notestaskingapp.onrender.com/api/notes/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
