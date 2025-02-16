@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import './Notes.css';
 import {
   FaMicrophone,
   FaImage,
@@ -33,7 +34,7 @@ const Notes = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setLoggedInUser(localStorage.getItem('loggedInuser'));
+    setLoggedInUser(localStorage.getItem("loggedInuser"));
     fetchNotes();
   }, []);
 
@@ -68,59 +69,59 @@ const Notes = () => {
 
   const deleteNote = async (id) => {
     try {
-        const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:8080/api/notes/${id}`, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            },
-        });
-        const result = await response.json();
-        if (result.success) {
-            setNotes(prevNotes => prevNotes.filter(note => note._id !== id));
-        }
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://localhost:8080/api/notes/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const result = await response.json();
+      if (result.success) {
+        setNotes((prevNotes) => prevNotes.filter((note) => note._id !== id));
+      }
     } catch (err) {
-        console.error(err);
+      console.error(err);
     }
   };
 
   const fetchNotes = async () => {
     try {
-        const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:8080/api/notes', {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            },
-        });
-        const result = await response.json();
-        if (result.success) {
-            setNotes(result.notes);
-        }
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:8080/api/notes", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const result = await response.json();
+      if (result.success) {
+        setNotes(result.notes);
+      }
     } catch (err) {
-        console.error(err);
+      console.error(err);
     }
   };
 
   const addNote = async () => {
     if (input.trim() !== "") {
-        try {
-            const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:8080/api/notes', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ text: input }),
-            });
-            const result = await response.json();
-            if (result.success) {
-                setNotes([...notes, result.note]);
-                setInput("");
-            }
-        } catch (err) {
-            console.error(err);
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch("http://localhost:8080/api/notes", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ text: input }),
+        });
+        const result = await response.json();
+        if (result.success) {
+          setNotes([...notes, result.note]);
+          setInput("");
         }
+      } catch (err) {
+        console.error(err);
+      }
     }
   };
 
@@ -179,31 +180,37 @@ const Notes = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-900 text-white">
+    <div className=" notes-hero  flex h-screen  text-white">
       {/* Sidebar */}
       <div
-        className={`fixed md:static top-0 left-0 h-full w-64 bg-gray-800 p-5 shadow-lg transform ${
+        className={` notes-sidebar  fixed md:static top-0 left-0 h-full w-64  p-5 shadow-lg transform ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } transition-transform md:translate-x-0 z-50`}
       >
         <div className="flex justify-between items-center">
-          <h1 className="text-xl font-bold">Notezy</h1>
-          <button className="md:hidden text-white" onClick={() => setSidebarOpen(false)}>
+          <h1 className="notezy font-bold">Notezy</h1>
+          <button
+            className="md:hidden text-white"
+            onClick={() => setSidebarOpen(false)}
+          >
             <FaTimes size={20} />
           </button>
         </div>
         <ul className="mt-6">
-          <li className={`p-3 rounded mb-2 flex items-center cursor-pointer ${activeTab === "home" ? "bg-purple-600" : "bg-gray-700"}`} onClick={() => setActiveTab("home")}>
+        <li className={`p-3 rounded mb-2 flex items-center cursor-pointer ${activeTab === "home" ? "bg-purple-600" : "#181515"}`} onClick={() => setActiveTab("home")}>
             <FaHome className="mr-2" /> Home
           </li>
-          <li className={`p-3 rounded flex items-center cursor-pointer ${activeTab === "favorites" ? "bg-purple-600" : "bg-gray-700"}`} onClick={() => setActiveTab("favorites")}>
+          <li className={`p-3 rounded flex items-center cursor-pointer ${activeTab === "favorites" ? "bg-purple-600" : "#181515"}`} onClick={() => setActiveTab("favorites")}>
             <FaStar className="mr-2" /> Favorites
           </li>
         </ul>
         <div className="absolute bottom-4 left-4 flex items-center gap-2">
           <FaUser className="mr-2" />
           {loggedInUser}
-          <button className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded" onClick={handleLogout}>
+          <button
+            className=" hover:bg-gray-600 text-white font-bold py-2 px-4 rounded"  style={{ backgroundColor: "#302f2f" }}
+            onClick={handleLogout}
+          >
             Logout
           </button>
         </div>
@@ -211,76 +218,135 @@ const Notes = () => {
 
       {/* Main Content */}
       <div className="flex-1 p-6 flex flex-col relative">
-        <button className="md:hidden absolute top-4 left-4 text-white z-10" onClick={() => setSidebarOpen(true)}>
+        <button
+          className="md:hidden absolute top-4 left-4 text-white z-10"
+          onClick={() => setSidebarOpen(true)}
+        >
           <FaBars size={20} />
         </button>
 
         {/* Search Bar */}
-        <div className="relative w-full md:w-1/2 mt-12 md:mt-0 mb-6">
-          <input type="text" placeholder="Search notes..." className="w-full p-3 bg-gray-700 shadow rounded-lg text-white text-lg pl-10" value={search} onChange={(e) => setSearch(e.target.value)} />
-          <FaSearch className="absolute top-3 left-3 text-gray-400" />
+        <div className="relative w-full md:w-2/2 mt-12 md:mt-0 mb-6 text-white">
+          <input
+            type="text"
+            placeholder="Search notes..."
+            className="w-full p-3   shadow rounded-lg text-white text-lg pl-10"  style={{ backgroundColor: "#181515" }}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <FaSearch className="absolute top-5 left-4 text-gray-400" />
         </div>
 
         {/* Notes List */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-auto">
-          {notes.filter((note) => (activeTab === "favorites" ? note.favorite && note.text.toLowerCase().includes(search.toLowerCase()) : note.text.toLowerCase().includes(search.toLowerCase()))).map((note) => (
-            <div key={note._id} className="bg-gray-800 p-4 shadow-md rounded-lg relative">
-              <p className="font-bold">{note.text}</p>
-              {note.image && <img src={note.image} alt="note" className="mt-2 rounded-lg" />}
-              <div className="absolute bottom-2 right-2 flex gap-2">
-                <button onClick={() => copyToClipboard(note.text)}>
-                  <FaCopy className="text-gray-400" />
-                </button>
-                <button onClick={() => openModal(note)}>
-                  <FaEdit className="text-gray-400" />
-                </button>
-                <button onClick={() => toggleFavorite(note._id)}>
-                  <FaStar className={note.favorite ? "text-yellow-400" : "text-gray-400"} />
-                </button>
-                <button onClick={() => deleteNote(note._id)}>
-                  <FaTrash className="text-red-500" />
-                </button>
+        <div className=" notes-list   grid grid-cols-1 md:grid-cols-2 gap-5 overflow-auto">
+          {notes
+            .filter((note) =>
+              activeTab === "favorites"
+                ? note.favorite && note.text.toLowerCase().includes(search.toLowerCase())
+                : note.text.toLowerCase().includes(search.toLowerCase())
+            )
+            .map((note) => (
+              <div
+                key={note._id}
+                className=" p-4 shadow-md rounded-lg relative break-words" style={{ backgroundColor: "#302f2f" }}
+              >
+                <p className="font-bold">{note.text}</p>
+                {note.image && (
+                  <img src={note.image} alt="note" className="mt-2 rounded-lg" />
+                )}
+                <div className="absolute bottom-2 right-2 flex gap-2 ">
+                  <button onClick={() => copyToClipboard(note.text)}>
+                    <FaCopy className="text-gray-400 hover:text-white" />
+                  </button>
+                  <button onClick={() => openModal(note)}>
+                    <FaEdit className="text-gray-400 hover:text-white" />
+                  </button>
+                  <button onClick={() => toggleFavorite(note._id)}>
+                    <FaStar
+                      className={`${
+                        note.favorite ? "text-yellow-400" : "text-gray-400"
+                      } hover:text-yellow-400`}
+                    />
+                  </button>
+                  <button onClick={() => deleteNote(note._id)}>
+                    <FaTrash className="text-red-500 hover:text-red-600" />
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
 
         {/* Input Box */}
-        <div className="fixed bottom-4 left-4 right-4 md:left-68 md:right-6 bg-gray-800 p-3 shadow-lg rounded-lg flex items-center space-x-3">
+        <div
+  className="fixed bottom-4 left-4 right-4 md:left-68 md:right-6 p-3 shadow-lg rounded-lg flex items-center space-x-3"
+  style={{ backgroundColor: "#181515" }}
+>
           <div className="relative flex-1">
-            <input type="text" className="w-full p-3 bg-gray-700 text-white rounded-lg pl-10" placeholder="Write a note..." value={input} onChange={(e) => setInput(e.target.value)} />
-            <FaMicrophone className={`absolute top-3 left-3 ${recording ? "text-red-500" : "text-gray-400"}`} onClick={startRecording} />
+            <input
+              type="text"
+              className="w-full p-3  text-bold  rounded-lg pl-10"
+              placeholder="Write a note..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+            />
+            <FaMicrophone
+              className={`absolute top-4 left-3 ${
+                recording ? "text-red-500" : "text-white"
+              } cursor-pointer`}
+              onClick={startRecording}
+            />
           </div>
-          
-          <button onClick={addNote} className="bg-purple-600 text-white px-4 py-2 rounded-lg">Save</button>
+          <button
+            onClick={addNote}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
+          >
+            Save Note
+          </button>
         </div>
 
         {/* Modal */}
         {isModalOpen && selectedNote && (
-          <div className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center ${isFullscreen ? "p-0" : "p-4"}`}>
-            <div className={`bg-gray-800 rounded-lg shadow-lg ${isFullscreen ? "w-full h-full" : "w-11/12 md:w-1/2"}`}>
+          <div
+            className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center ${
+              isFullscreen ? "p-0" : "p-4"
+            }`}
+          >
+            <div
+              className={` rounded-lg shadow-lg ${
+                isFullscreen ? "w-full h-full" : "w-11/12 md:w-1/2"
+              }`}
+              style={{ backgroundColor: "#181515" }}
+            >
               <div className="p-4">
                 <textarea
-                  className="w-full p-3 bg-gray-700 text-white rounded-lg mb-4"
+                  className="w-full p-3  text-white rounded-lg mb-4 " style={{ backgroundColor: "#302f2f" }}
                   value={editText}
                   onChange={(e) => setEditText(e.target.value)}
                 />
-                {selectedNote.image && <img src={selectedNote.image} alt="note" className="mt-2 rounded-lg" />}
+                {selectedNote.image && (
+                  <img
+                    src={selectedNote.image}
+                    alt="note"
+                    className="mt-2 rounded-lg"
+                  />
+                )}
                 <div className="flex justify-between items-center">
                   <div className="flex gap-2">
-                    <button onClick={handleEditNote} className="bg-purple-600 text-white px-4 py-2 rounded-lg">Save</button>
-                    <button onClick={toggleFullscreen} className="bg-gray-700 text-white px-4 py-2 rounded-lg">
-                      <FaExpand />
+                    <button
+                      onClick={handleEditNote}
+                      className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg"
+                    >
+                      Save
                     </button>
-                    <button onClick={() => toggleFavorite(selectedNote._id)} className="bg-gray-700 text-white px-4 py-2 rounded-lg">
-                      <FaStar className={selectedNote.favorite ? "text-yellow-400" : "text-gray-400"} />
-                    </button>
-                    <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" id="image-upload" />
-                    <label htmlFor="image-upload" className="bg-gray-700 text-white px-4 py-2 rounded-lg cursor-pointer">
-                      <FaImage />
-                    </label>
+  
+                    
                   </div>
-                  <button onClick={closeModal} className="bg-red-600 text-white px-4 py-2 rounded-lg">Close</button>
+                  <button
+                    onClick={closeModal}
+                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
+                  >
+                    Close
+                  </button>
                 </div>
               </div>
             </div>
