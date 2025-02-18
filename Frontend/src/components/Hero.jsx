@@ -1,6 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-// Header Component
+
+
+
 function Header() {
   const navigate2 = useNavigate();
   const navigate3 = useNavigate();
@@ -31,23 +33,23 @@ function Header() {
   );
 }
 
-// Hero Component
+
 function Hero() {
 
   const navigate = useNavigate();
 
 
   const handlego = () => {
-    navigate("/sign");
+    navigate("/notes");
   }
 
   
   return (
     <>
-      <Header /> {/* Include the Header component here */}
+      <Header /> 
       <section className="bg-black text-white min-h-screen flex items-center justify-center px-6 md:px-16 pt-20">
         <div className="max-w-7xl w-full grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          {/* Left Section */}
+          
           <div>
             <h1 className="text-5xl font-bold leading-tight">
               All your notes. <br /> Organized. <br /> Effortless.
@@ -67,13 +69,13 @@ function Hero() {
             </div>
           </div>
 
-          {/* Right Section */}
+         
           <div className="relative">
-            {/* Notes UI */}
+           
             <div className="relative flex flex-col items-center">
-  {/* Notes Image */}
+  
  
-  {/* Notes UI */}
+  
   <div className="bg-gray-900 rounded-xl p-6 shadow-lg w-full max-w-md">
     <div className="flex justify-between text-gray-400 text-sm">
       <p>Last Edited: 10:45 AM</p>

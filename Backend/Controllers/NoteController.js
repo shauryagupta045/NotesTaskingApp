@@ -11,8 +11,8 @@ const getNotes = async (req, res) => {
 
 const addNote = async (req, res) => {
     try {
-        const { text } = req.body;
-        const note = new NoteModel({ text, user: req.user._id });
+        const { title, text } = req.body;
+        const note = new NoteModel({ title, text, user: req.user._id });
         await note.save();
         res.status(201).json({ message: "Note added successfully", success: true, note });
     } catch (err) {

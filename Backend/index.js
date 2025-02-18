@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 8080;
 
 // CORS Configuration
 const allowedOrigins = [
-    'https://notestaskingapp-aqrp.onrender.com', // Replace this with your frontend's deployed URL
+    'https://notestaskingapp-aqrp.onrender.com', 
 ];
 
 app.use(cors({
