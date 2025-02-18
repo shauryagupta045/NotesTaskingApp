@@ -20,7 +20,6 @@ import { useNavigate } from "react-router-dom";
 const Notes = () => {
   const [notes, setNotes] = useState([]);
   const [input, setInput] = useState("");
-  const [title, setTitle] = useState("");
   const [search, setSearch] = useState("");
   const [recording, setRecording] = useState(false);
   const [activeTab, setActiveTab] = useState("home");
@@ -29,7 +28,6 @@ const Notes = () => {
   const [selectedNote, setSelectedNote] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editText, setEditText] = useState("");
-  const [editTitle, setEditTitle] = useState("");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const recognitionRef = useRef(null);
 
@@ -105,7 +103,7 @@ const Notes = () => {
   };
 
   const addNote = async () => {
-    if (input.trim() !== "" && title.trim() !== "") {
+    if (input.trim() !== "") {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(`https://notestaskingapp.onrender.com/api/notes`, {
@@ -114,13 +112,12 @@ const Notes = () => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ title, text: input }),
+          body: JSON.stringify({ text: input }),
         });
         const result = await response.json();
         if (result.success) {
           setNotes([...notes, result.note]);
           setInput("");
-          setTitle("");
         }
       } catch (err) {
         console.error(err);
@@ -141,7 +138,6 @@ const Notes = () => {
   const openModal = (note) => {
     setSelectedNote(note);
     setEditText(note.text);
-    setEditTitle(note.title);
     setIsModalOpen(true);
   };
 
@@ -149,13 +145,12 @@ const Notes = () => {
     setIsModalOpen(false);
     setSelectedNote(null);
     setEditText("");
-    setEditTitle("");
   };
 
   const handleEditNote = () => {
     setNotes((prevNotes) =>
       prevNotes.map((note) =>
-        note._id === selectedNote._id ? { ...note, title: editTitle, text: editText } : note
+        note._id === selectedNote._id ? { ...note, text: editText } : note
       )
     );
     closeModal();
@@ -185,10 +180,10 @@ const Notes = () => {
   };
 
   return (
-    <div className="notes-hero flex h-screen text-white">
+    <div className=" notes-hero  flex h-screen  text-white">
       {/* Sidebar */}
       <div
-        className={`notes-sidebar fixed md:static top-0 left-0 h-full w-64 p-5 shadow-lg transform ${
+        className={` notes-sidebar  fixed md:static top-0 left-0 h-full w-64  p-5 shadow-lg transform ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } transition-transform md:translate-x-0 z-50`}
       >
@@ -202,7 +197,7 @@ const Notes = () => {
           </button>
         </div>
         <ul className="mt-6">
-          <li className={`p-3 rounded mb-2 flex items-center cursor-pointer ${activeTab === "home" ? "bg-purple-600" : "#181515"}`} onClick={() => setActiveTab("home")}>
+        <li className={`p-3 rounded mb-2 flex items-center cursor-pointer ${activeTab === "home" ? "bg-purple-600" : "#181515"}`} onClick={() => setActiveTab("home")}>
             <FaHome className="mr-2" /> Home
           </li>
           <li className={`p-3 rounded flex items-center cursor-pointer ${activeTab === "favorites" ? "bg-purple-600" : "#181515"}`} onClick={() => setActiveTab("favorites")}>
@@ -213,7 +208,7 @@ const Notes = () => {
           <FaUser className="mr-2" />
           {loggedInUser}
           <button
-            className="hover:bg-gray-600 text-white font-bold py-2 px-4 rounded" style={{ backgroundColor: "#302f2f" }}
+            className=" hover:bg-gray-600 text-white font-bold py-2 px-4 rounded"  style={{ backgroundColor: "#302f2f" }}
             onClick={handleLogout}
           >
             Logout
@@ -235,7 +230,7 @@ const Notes = () => {
           <input
             type="text"
             placeholder="Search notes..."
-            className="w-full p-3 shadow rounded-lg text-white text-lg pl-10" style={{ backgroundColor: "#181515" }}
+            className="w-full p-3   shadow rounded-lg text-white text-lg pl-10"  style={{ backgroundColor: "#181515" }}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -243,7 +238,7 @@ const Notes = () => {
         </div>
 
         {/* Notes List */}
-        <div className="notes-list grid grid-cols-1 md:grid-cols-2 gap-5 overflow-auto">
+        <div className=" notes-list   grid grid-cols-1 md:grid-cols-2 gap-5 overflow-auto">
           {notes
             .filter((note) =>
               activeTab === "favorites"
@@ -253,14 +248,13 @@ const Notes = () => {
             .map((note) => (
               <div
                 key={note._id}
-                className="p-4 shadow-md rounded-lg relative break-words" style={{ backgroundColor: "#302f2f" }}
+                className=" p-4 shadow-md rounded-lg relative break-words" style={{ backgroundColor: "#302f2f" }}
               >
-                <h2 className="font-bold text-lg mb-2">{note.title}</h2>
-                <p className="text-sm">{note.text}</p>
+                <p className="font-bold">{note.text}</p>
                 {note.image && (
                   <img src={note.image} alt="note" className="mt-2 rounded-lg" />
                 )}
-                <div className="absolute bottom-2 right-2 flex gap-2">
+                <div className="absolute bottom-2 right-2 flex gap-2 ">
                   <button onClick={() => copyToClipboard(note.text)}>
                     <FaCopy className="text-gray-400 hover:text-white" />
                   </button>
@@ -284,20 +278,13 @@ const Notes = () => {
 
         {/* Input Box */}
         <div
-          className="fixed bottom-4 left-4 right-4 md:left-68 md:right-6 p-3 shadow-lg rounded-lg flex flex-col space-y-3"
-          style={{ backgroundColor: "#181515" }}
-        >
-          <input
-            type="text"
-            className="w-full p-3 text-bold rounded-lg"
-            placeholder="Title..."
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
+  className="fixed bottom-4 left-4 right-4 md:left-68 md:right-6 p-3 shadow-lg rounded-lg flex items-center space-x-3"
+  style={{ backgroundColor: "#181515" }}
+>
           <div className="relative flex-1">
             <input
               type="text"
-              className="w-full p-3 text-bold rounded-lg pl-10"
+              className="w-full p-3  text-bold  rounded-lg pl-10"
               placeholder="Write a note..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -325,21 +312,14 @@ const Notes = () => {
             }`}
           >
             <div
-              className={`rounded-lg shadow-lg ${
+              className={` rounded-lg shadow-lg ${
                 isFullscreen ? "w-full h-full" : "w-11/12 md:w-1/2"
               }`}
               style={{ backgroundColor: "#181515" }}
             >
               <div className="p-4">
-                <input
-                  type="text"
-                  className="w-full p-3 text-white rounded-lg mb-4" style={{ backgroundColor: "#302f2f" }}
-                  value={editTitle}
-                  onChange={(e) => setEditTitle(e.target.value)}
-                  placeholder="Title..."
-                />
                 <textarea
-                  className="w-full p-3 text-white rounded-lg mb-4" style={{ backgroundColor: "#302f2f" }}
+                  className="w-full p-3  text-white rounded-lg mb-4 " style={{ backgroundColor: "#302f2f" }}
                   value={editText}
                   onChange={(e) => setEditText(e.target.value)}
                 />
@@ -358,6 +338,8 @@ const Notes = () => {
                     >
                       Save
                     </button>
+  
+                    
                   </div>
                   <button
                     onClick={closeModal}
