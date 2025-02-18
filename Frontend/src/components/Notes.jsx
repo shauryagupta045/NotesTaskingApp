@@ -125,6 +125,41 @@ const Notes = () => {
     }
   };
 
+  const updateNote = async (id, title, text) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`https://notestaskingapp.onrender.com/api/notes/${id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ title, text }),
+      });
+      const result = await response.json();
+      if (result.success) {
+        return result.note;
+      }
+    } catch (err) {
+      console.error(err);
+    }
+    return null;
+  };
+
+  const handleEditNote = async () => {
+    if (selectedNote) {
+      const updatedNote = await updateNote(selectedNote._id, editTitle, editText);
+      if (updatedNote) {
+        setNotes((prevNotes) =>
+          prevNotes.map((note) =>
+            note._id === selectedNote._id ? updatedNote : note
+          )
+        );
+        closeModal();
+      }
+    }
+  };
+
   const handleLogout = (e) => {
     e.preventDefault();
     localStorage.removeItem("token");
@@ -147,15 +182,6 @@ const Notes = () => {
     setSelectedNote(null);
     setEditText("");
     setEditTitle("");
-  };
-
-  const handleEditNote = () => {
-    setNotes((prevNotes) =>
-      prevNotes.map((note) =>
-        note._id === selectedNote._id ? { ...note, title: editTitle, text: editText } : note
-      )
-    );
-    closeModal();
   };
 
   const copyToClipboard = (text) => {
