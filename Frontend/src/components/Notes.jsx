@@ -87,7 +87,7 @@ const Notes = () => {
   const fetchNotes = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`https://notestaskingapp.onrender.com/api/notes`, {
+      const response = await fetch(`https://notes-tasking-app-nh1p.vercel.app/api/notes`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -105,7 +105,7 @@ const Notes = () => {
     if (input.trim() !== "" && title.trim() !== "") {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch(`https://notestaskingapp.onrender.com/api/notes`, {
+        const response = await fetch(`https://notes-tasking-app-nh1p.vercel.app/api/notes`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
