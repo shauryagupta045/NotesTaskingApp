@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 8080;
 
 // CORS Configuration
 const allowedOrigins = [
-    'https://notes-tasking-app-nine.vercel.app/', 
+    'https://notes-tasking-app-nine.vercel.app'
 ];
 
 app.use(cors({
@@ -24,7 +24,15 @@ app.use(cors({
     },
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true, 
 }));
+
+app.options('*', cors()); // Handle preflight requests
+
+app.use((req, res, next) => {
+    console.log('Request Origin:', req.headers.origin);
+    next();
+});
 
 app.use(bodyParser.json());
 app.use('/auth', AuthRouter);
