@@ -38,7 +38,7 @@ const [signupInfo , setsignupInfo] = useState({
     }
 
 try{
-  const url = "https://notestaskingapp.onrender.com/auth/signup";
+  const url = "https://notes-tasking-app-nh1p.vercel.app/auth/signup";
   const response = await fetch(url,{
     method: 'POST',
     headers:{

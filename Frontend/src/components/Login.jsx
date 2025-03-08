@@ -37,7 +37,7 @@ const Login = () => {
         }
     
     try{
-      const url = "https://notestaskingapp.onrender.com/auth/login";
+      const url = "https://notes-tasking-app-nh1p.vercel.app/auth/login";
       const response = await fetch(url,{
         method: 'POST',
         headers:{

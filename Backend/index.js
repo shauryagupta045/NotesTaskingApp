@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 8080;
 
 // CORS Configuration
 const allowedOrigins = [
-    'https://notestaskingapp-aqrp.onrender.com', 
+    'https://notes-tasking-app-nine.vercel.app/', 
 ];
 
 app.use(cors({
